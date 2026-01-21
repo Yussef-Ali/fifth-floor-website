@@ -1,11 +1,32 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import ArchitecturalShapes from '@/components/ui/architectural-shapes'
-import GridBackground, { DotPattern } from '@/components/ui/grid-background'
+import { DotPattern } from '@/components/ui/grid-background'
+import { OFFICE_LOCATIONS, SERVICES, COMPANY_INFO } from '@/lib/contact-config'
+import { contactFormSchema, validateForm, validateField, type ContactFormData, type FormErrors } from '@/lib/contact-schema'
+
+type FormState = {
+  name: string
+  email: string
+  serviceType: string
+  message: string
+}
+
+const initialFormState: FormState = {
+  name: '',
+  email: '',
+  serviceType: '',
+  message: '',
+}
 
 export default function Contact() {
   const sectionRef = useRef<HTMLDivElement>(null)
+  const [formData, setFormData] = useState<FormState>(initialFormState)
+  const [errors, setErrors] = useState<FormErrors<ContactFormData>>({})
+  const [touched, setTouched] = useState<Partial<Record<keyof FormState, boolean>>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -27,10 +48,71 @@ export default function Contact() {
     return () => observer.disconnect()
   }, [])
 
+  const handleChange = useCallback((
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+
+    if (errors[name as keyof ContactFormData]) {
+      setErrors(prev => ({ ...prev, [name]: undefined }))
+    }
+  }, [errors])
+
+  const handleBlur = useCallback((
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target
+    setTouched(prev => ({ ...prev, [name]: true }))
+
+    const error = validateField(contactFormSchema, name as keyof ContactFormData, value)
+    if (error) {
+      setErrors(prev => ({ ...prev, [name]: error }))
+    }
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const result = validateForm(contactFormSchema, formData)
+
+    if (!result.success) {
+      setErrors(result.errors)
+      setTouched({ name: true, email: true, serviceType: true, message: true })
+      return
+    }
+
+    setIsSubmitting(true)
+    setSubmitStatus('idle')
+
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setSubmitStatus('success')
+      setFormData(initialFormState)
+      setErrors({})
+      setTouched({})
+      setTimeout(() => setSubmitStatus('idle'), 5000)
+    } catch {
+      setSubmitStatus('error')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const getInputClassName = (field: keyof FormState) => {
+    const baseClass = "w-full bg-transparent border-b py-3 text-[#3E3E3E] placeholder-[#919191] focus:outline-none transition-all duration-300"
+    const hasError = touched[field] && errors[field]
+    const isValid = touched[field] && !errors[field] && formData[field]
+
+    if (hasError) return `${baseClass} border-red-400 focus:border-red-500`
+    if (isValid) return `${baseClass} border-green-400 focus:border-green-500`
+    return `${baseClass} border-[#919191] focus:border-[#3E3E3E]`
+  }
+
   return (
     <section
       id="contact"
-      className="section-padding  relative overflow-hidden"
+      className="section-padding relative overflow-hidden"
     >
       {/* Decorative Elements */}
       <ArchitecturalShapes
@@ -40,15 +122,6 @@ export default function Contact() {
         opacity={0.05}
       />
       <div className="absolute top-1/2 right-0 w-px h-40 bg-[#919191] opacity-20" />
-
-      {/* Fading Grid Background - Right Side */}
-      {/* <GridBackground
-        fadeFrom="right"
-        gridColor="#919191"
-        gridSizeX={26}
-        gridSizeY={34}
-        opacity={0.2}
-      /> */}
 
       {/* Dot Pattern - Bottom Left Corner */}
       <DotPattern
@@ -83,16 +156,18 @@ export default function Contact() {
               {/* Contact Details */}
               <div className="space-y-6">
                 <div>
-                  <p className="text-semibold uppercase tracking-widest text-[#3e3e3e]  mb-2">Locations</p>
-                  <p className="text-base text-[#3E3E3E]">Kuwait 🇰🇼 | UAE 🇦🇪</p>
+                  <p className="text-semibold uppercase tracking-widest text-[#3e3e3e] mb-2">Locations</p>
+                  <p className="text-base text-[#3E3E3E]">
+                    {OFFICE_LOCATIONS.map(loc => `${loc.region} ${loc.country}`).join(' | ')}
+                  </p>
                 </div>
                 <div>
                   <p className="text-semibold uppercase tracking-widest text-[#3e3e3e] mb-2">Email</p>
                   <a
-                    href="mailto:hello@fifthfloor.agency"
+                    href={`mailto:${COMPANY_INFO.mainEmail}`}
                     className="text-base text-[#3E3E3E] hover:text-[#6A6A6A] transition-colors duration-300 hover-line-extend"
                   >
-                    hello@fifthfloor.agency
+                    {COMPANY_INFO.mainEmail}
                   </a>
                 </div>
               </div>
@@ -103,29 +178,43 @@ export default function Contact() {
               <div className="absolute -right-20 top-0 w-full h-full opacity-10 pointer-events-none">
                 <img src="/images/contact-form-visual.png" className="object-cover w-full h-full" alt="" />
               </div>
-              <form className="space-y-8 relative z-10">
+              <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
                 {/* Name */}
                 <div>
                   <label className="block text-semibold uppercase tracking-widest text-[#3e3e3e] mb-3">
-                    Your Name
+                    Your Name <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
-                    className="w-full bg-transparent border-b border-[#919191] py-3 text-[#3E3E3E] placeholder-[#919191] focus:outline-none focus:border-[#3E3E3E] transition-colors duration-300"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={getInputClassName('name')}
                     placeholder="Enter your name"
                   />
+                  {touched.name && errors.name && (
+                    <p className="mt-2 text-sm text-red-500">{errors.name}</p>
+                  )}
                 </div>
 
                 {/* Email */}
                 <div>
                   <label className="block text-semibold uppercase tracking-widest text-[#3e3e3e] mb-3">
-                    Email Address
+                    Email Address <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="email"
-                    className="w-full bg-transparent border-b border-[#919191] py-3 text-[#3E3E3E] placeholder-[#919191] focus:outline-none focus:border-[#3E3E3E] transition-colors duration-300"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={getInputClassName('email')}
                     placeholder="Enter your email"
                   />
+                  {touched.email && errors.email && (
+                    <p className="mt-2 text-sm text-red-500">{errors.email}</p>
+                  )}
                 </div>
 
                 {/* Service */}
@@ -134,39 +223,68 @@ export default function Contact() {
                     Service Interest
                   </label>
                   <select
-                    className="w-full bg-transparent border-b border-[#919191] py-3 text-[#3E3E3E] focus:outline-none focus:border-[#3E3E3E] transition-colors duration-300 cursor-pointer"
+                    name="serviceType"
+                    value={formData.serviceType}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={`${getInputClassName('serviceType')} cursor-pointer`}
                   >
                     <option value="">Select a service</option>
-                    <option value="brand-strategy">Brand Strategy</option>
-                    <option value="branding">Branding</option>
-                    <option value="marketing">Marketing</option>
-                    <option value="events">Events</option>
-                    <option value="booths">Booths</option>
-                    <option value="creative-concepts">Creative Concepts</option>
+                    {SERVICES.map(service => (
+                      <option key={service.id} value={service.title}>{service.title}</option>
+                    ))}
                   </select>
                 </div>
 
                 {/* Message */}
                 <div>
                   <label className="block text-semibold uppercase tracking-widest text-[#3e3e3e] mb-3">
-                    Project Details
+                    Project Details <span className="text-red-400">*</span>
                   </label>
                   <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
                     rows={4}
-                    className="w-full bg-transparent border-b border-[#919191] py-3 text-[#3E3E3E] placeholder-[#919191] focus:outline-none focus:border-[#3E3E3E] transition-colors duration-300 resize-none"
+                    className={`${getInputClassName('message')} resize-none`}
                     placeholder="Tell us about your project"
                   />
+                  {touched.message && errors.message && (
+                    <p className="mt-2 text-sm text-red-500">{errors.message}</p>
+                  )}
                 </div>
 
                 {/* Submit */}
                 <div className="pt-4">
                   <button
                     type="submit"
-                    className="px-10 py-4 bg-[#3E3E3E] text-[#ffffff] font-medium tracking-wide hover:bg-[#6A6A6A] transition-all duration-400 hover-lift"
+                    disabled={isSubmitting}
+                    className="px-10 py-4 bg-[#3E3E3E] text-[#ffffff] font-medium tracking-wide hover:bg-[#6A6A6A] transition-all duration-400 hover-lift disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    Send Message
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </span>
+                    ) : 'Send Message'}
                   </button>
                 </div>
+
+                {/* Success/Error Messages */}
+                {submitStatus === 'success' && (
+                  <div className="py-4 px-6 bg-green-50 border-l-4 border-green-500 rounded">
+                    <p className="text-green-700 font-semibold">Thank you! We'll be in touch soon.</p>
+                  </div>
+                )}
+                {submitStatus === 'error' && (
+                  <div className="py-4 px-6 bg-red-50 border-l-4 border-red-500 rounded">
+                    <p className="text-red-700 font-semibold">Something went wrong. Please try again.</p>
+                  </div>
+                )}
               </form>
             </div>
           </div>
