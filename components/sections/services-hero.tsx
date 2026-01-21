@@ -1,5 +1,7 @@
 'use client'
 
+import Image from 'next/image'
+
 import DiagonalGrid from '@/components/ui/diagonal-grid'
 import { CircleDecoration } from '@/components/ui/architectural-shapes'
 import ArchitecturalShapes from '@/components/ui/architectural-shapes'
@@ -53,6 +55,10 @@ export default function ServicesHero() {
       <div className="absolute top-1/3 right-1/3 w-2 h-2 bg-[#3E3E3E]/20 rotate-45 hidden md:block" />
       <div className="absolute bottom-1/4 left-1/3 w-3 h-3 border border-[#919191]/30 rotate-45 hidden md:block" />
       <div className="absolute top-2/3 right-1/4 w-4 h-4 border border-[#3E3E3E]/20 rounded-full hidden lg:block" />
+      {/* Floating Brand Icon */}
+      <div className="absolute top-40 left-20 w-16 h-16 opacity-10 hidden lg:block animate-float" style={{ animationDelay: '1.5s' }}>
+        <Image src="/logos/fifth-icon-dark.png" alt="" fill className="object-contain" />
+      </div>
 
       <div className="relative z-10 max-w-4xl">
         {/* Premium Label with line accents */}
