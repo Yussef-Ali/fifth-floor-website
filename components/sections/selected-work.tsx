@@ -29,7 +29,7 @@ const projects = [
   },
   {
     id: 4,
-    title: 'Dubai Design Week',
+    title: 'Abu Dhabi Design Week',
     category: 'Exhibition Booth',
     year: '2023',
     image: '/projects/project-2.png',

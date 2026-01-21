@@ -6,7 +6,7 @@ import GridBackground from '@/components/ui/grid-background'
 const clients = [
   'Ministry of Culture',
   'Kuwait Investment Authority',
-  'Dubai Design District',
+  'Abu Dhabi Design District',
   'Al Marai Group',
   'KIPCO',
   'The Avenues',

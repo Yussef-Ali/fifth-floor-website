@@ -19,9 +19,9 @@ export default function CustomMap({
             url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3477.161989093856!2d47.9774!3d29.3759!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3fcf84ba03328515%3A0x6b47c0b7847c23c1!2sKuwait%20City%2C%20Kuwait!5e0!3m2!1sen!2skw!4v1705824000000!5m2!1sen!2skw"
         },
         {
-            name: "Dubai Office",
-            // Dubai coordinates approx
-            url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d231221.7891789456!2d55.1328!3d25.0768!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f43496ad9c645%3A0xbde66e5084295162!2sDubai%20-%20United%20Arab%20Emirates!5e0!3m2!1sen!2skw!4v1705824000000!5m2!1sen!2skw"
+            name: "Abu Dhabi Office",
+            // Abu Dhabi coordinates approx
+            url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d231221.7891789456!2d55.1328!3d25.0768!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f43496ad9c645%3A0xbde66e5084295162!2sAbu Dhabi%20-%20United%20Arab%20Emirates!5e0!3m2!1sen!2skw!4v1705824000000!5m2!1sen!2skw"
         }
     ],
     activeLocationIndex = 0,

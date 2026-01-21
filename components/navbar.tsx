@@ -42,9 +42,10 @@ export default function NavBar({ isScrolled = false }: NavBarProps) {
 
   return (
     <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-500 ease-in-out ${scrolled && !isOpen
-        ? 'bg-[#f8f8f8]/80 backdrop-blur-md border-b border-[#3E3E3E]/5 py-4'
-        : 'bg-transparent py-6'
+      className={`fixed top-0 w-full z-50 transition-[padding,background-color,border-color] duration-500 ease-in-out ${scrolled ? 'py-4' : 'py-6'
+        } ${scrolled && !isOpen
+          ? 'bg-[#f8f8f8]/80 backdrop-blur-md border-b border-[#3E3E3E]/5'
+          : 'bg-transparent'
         }`}
     >
       <div className="relative z-50 max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20 flex items-center justify-between">
@@ -55,11 +56,20 @@ export default function NavBar({ isScrolled = false }: NavBarProps) {
           className="flex items-center gap-3 group transition-opacity duration-300 hover:opacity-80"
         >
           <div className="relative w-12 h-12 shrink-0">
+            {/* Dark Logo (Default) */}
             <Image
-              src={isOpen ? "/logos/fifth-icon-light.png" : "/logos/fifth-icon-dark.png"}
+              src="/logos/fifth-icon-dark.png"
               alt="Fifth Floor"
               fill
-              className="object-contain rounded-full transition-opacity duration-300"
+              className={`object-contain rounded-full transition-opacity duration-300 ${isOpen ? 'opacity-0' : 'opacity-100'}`}
+              priority
+            />
+            {/* Light Logo (Mobile Menu) */}
+            <Image
+              src="/logos/fifth-icon-light.png"
+              alt="Fifth Floor"
+              fill
+              className={`object-contain rounded-full transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
               priority
             />
           </div>
