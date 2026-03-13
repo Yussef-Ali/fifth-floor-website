@@ -1,6 +1,7 @@
 import React from "react"
 import type { Metadata, Viewport } from 'next'
 import { Analytics } from '@vercel/analytics/next'
+import GlobalCursor from '@/components/ui/global-cursor'
 import './globals.css'
 
 // Using system font stack for reliability - no network dependency
@@ -41,6 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${fontClass} antialiased overflow-x-hidden`}>
+        <GlobalCursor />
         {children}
         <Analytics />
       </body>

@@ -306,3 +306,9 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #6A6A6A;
 }
+
+/* Global Custom Cursor Hide (applied by JS on desktop only) */
+body.custom-cursor-enabled,
+body.custom-cursor-enabled * {
+  cursor: none !important;
+}
