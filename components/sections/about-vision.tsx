@@ -10,7 +10,7 @@ const capabilities = [
         title: 'Brand Architecture',
         shortDesc: 'Strategic Foundation',
         description: 'We construct durable brand strategies built to withstand market shifts. It starts with a philosophy, engineered into an identity.',
-        image: '/images/hero-bg.png' // Replace with relevant abstract or work image
+        image: '/images/about-hero-visual.png' // Replace with relevant abstract or work image
     },
     {
         id: '02',
@@ -24,14 +24,14 @@ const capabilities = [
         title: 'Digital Experiences',
         shortDesc: 'Interactive Reality',
         description: 'Crafting fluid, intuitive digital interfaces that operate on the edge of innovation, where technology feels invisible.',
-        image: '/images/selected-2.png' // Replace with relevant abstract or work image
+        image: '/images/contact-form-visual.png' // Replace with relevant abstract or work image
     },
     {
         id: '04',
         title: 'Cultural Curation',
         shortDesc: 'Narrative Alignment',
         description: 'Embedding brands into the cultural zeitgeist through bespoke events, activations, and meaningful collaborations.',
-        image: '/images/selected-3.png' // Replace with relevant abstract or work image
+        image: '/images/home-hero-visual.png' // Replace with relevant abstract or work image
     }
 ]
 
